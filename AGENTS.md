@@ -1,10 +1,10 @@
 # AGENTS.md
 
-This file provides guidance for AI coding agents working on the Bus.Net repository.
+This file provides guidance for AI coding agents working on the PTrampert.MessageBus repository.
 
 ## Project Overview
 
-Bus.Net is a lightweight .NET messaging abstraction for publishing messages and handling them through pluggable transports. It provides:
+PTrampert.MessageBus is a lightweight .NET messaging abstraction for publishing messages and handling them through pluggable transports. It provides:
 
 - A simple `IPublisher` API for sending messages.
 - Handler-based message processing via `IHandler<TMessage>`.
@@ -13,25 +13,25 @@ Bus.Net is a lightweight .NET messaging abstraction for publishing messages and 
 ## Repository Structure
 
 ```
-Bus.Net/                          # Core library (IPublisher, IHandler, BusService, etc.)
-Bus.Net.Transports.InMemory/      # In-memory transport implementation
-Bus.Net.Transports.RabbitMq/      # RabbitMQ transport implementation
-Bus.Net.Test/                     # Unit and end-to-end tests
-Bus.Net.sln                       # Solution file
-global.json                         # SDK version pin
+PTrampert.MessageBus/                          # Core library (IPublisher, IHandler, BusService, etc.)
+PTrampert.MessageBus.Transports.InMemory/      # In-memory transport implementation
+PTrampert.MessageBus.Transports.RabbitMq/      # RabbitMQ transport implementation
+PTrampert.MessageBus.Test/                     # Unit and end-to-end tests
+PTrampert.MessageBus.sln                       # Solution file
+global.json                                    # SDK version pin
 ```
 
 ## Building and Testing
 
 ```bash
 # Build the solution
-dotnet build Bus.Net.sln
+dotnet build PTrampert.MessageBus.sln
 
 # Run all tests
-dotnet test Bus.Net.sln
+dotnet test PTrampert.MessageBus.sln
 ```
 
-The RabbitMQ end-to-end tests automatically spin up a RabbitMQ container using Testcontainers. `Bus.Net.Test/rabbitmq.conf` is mounted into the container as its configuration file.
+The RabbitMQ end-to-end tests automatically spin up a RabbitMQ container using Testcontainers. `PTrampert.MessageBus.Test/rabbitmq.conf` is mounted into the container as its configuration file.
 
 ## Key Concepts
 
@@ -43,10 +43,10 @@ The RabbitMQ end-to-end tests automatically spin up a RabbitMQ container using T
 
 ## Adding a New Transport
 
-1. Create a new class library project (e.g., `Bus.Net.Transports.MyBroker`).
-2. Implement `ITransport` (defined in `Bus.Net/Transport/`, and optionally `ITransportSender`/`ITransportReceiver`) in your new transport project.
-3. Add a `ServiceCollectionExtensions` class with an `AddBus<MyBroker>Transport` extension method that calls `services.AddBus(configure => ...)` and registers the transport.
-4. Add end-to-end tests that extend `EndToEndTestFixture` in `Bus.Net.Test/E2E/`.
+1. Create a new class library project (e.g., `PTrampert.MessageBus.Transports.MyBroker`).
+2. Implement `ITransport` (defined in `PTrampert.MessageBus/Transport/`, and optionally `ITransportSender`/`ITransportReceiver`) in your new transport project.
+3. Add a `ServiceCollectionExtensions` class with an `AddPTrampertMessageBus<MyBroker>Transport` extension method that calls `services.AddPTrampertMessageBus(configure => ...)` and registers the transport.
+4. Add end-to-end tests that extend `EndToEndTestFixture` in `PTrampert.MessageBus.Test/E2E/`.
 5. Set `<SymbolPackageFormat>snupkg</SymbolPackageFormat>` in the new `.csproj` to match the other transport projects.
 
 ## Coding Conventions
@@ -56,7 +56,7 @@ The RabbitMQ end-to-end tests automatically spin up a RabbitMQ container using T
 - Use `record` or `sealed record` for message types and value objects.
 - Handlers and `IPublisher` are registered as **scoped** services; transports (`ITransportSender`/`ITransportReceiver`) and registries are **singletons**.
 - Tests use **NUnit** with `[TestFixture]`/`[Test]`/`[SetUp]`/`[TearDown]` attributes.
-- Keep transport-specific code out of the core `Bus.Net` library.
+- Keep transport-specific code out of the core `PTrampert.MessageBus` library.
 
 ## CI / Pull Requests
 
