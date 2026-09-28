@@ -12,9 +12,9 @@ namespace PTrampert.MessageBus.Transports.RabbitMq;
 /// </summary>
 public sealed class RabbitMqMessageMapper : IRabbitMqMessageMapper
 {
-    private const string TopicHeader = "messagebus.topic";
-    private const string BrokerHeader = "messagebus.broker";
-    private const string SentAtUtcHeader = "messagebus.sent-at-utc";
+    private const string TopicHeader = "ptrampert.messagebus.topic";
+    private const string BrokerHeader = "ptrampert.messagebus.broker";
+    private const string SentAtUtcHeader = "ptrampert.messagebus.sent-at-utc";
     private const string DeliveryCountHeader = "x-delivery-count";
     private const string DeathHeader = "x-death";
 

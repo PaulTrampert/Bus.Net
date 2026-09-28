@@ -39,9 +39,9 @@ public sealed class RabbitMqMessageMapperTests
         Assert.That(properties.Timestamp.UnixTime, Is.EqualTo(sentAt.ToUnixTimeSeconds()));
         Assert.That(properties.DeliveryMode, Is.EqualTo(DeliveryModes.Persistent));
         Assert.That(properties.Headers!["trace-id"], Is.EqualTo("abc-123"));
-        Assert.That(properties.Headers!["messagebus.topic"], Is.EqualTo("orders.created"));
-        Assert.That(properties.Headers!["messagebus.broker"], Is.EqualTo("broker-a"));
-        Assert.That(properties.Headers!["messagebus.sent-at-utc"], Is.EqualTo(sentAt.ToString("O")));
+        Assert.That(properties.Headers!["ptrampert.messagebus.topic"], Is.EqualTo("orders.created"));
+        Assert.That(properties.Headers!["ptrampert.messagebus.broker"], Is.EqualTo("broker-a"));
+        Assert.That(properties.Headers!["ptrampert.messagebus.sent-at-utc"], Is.EqualTo(sentAt.ToString("O")));
     }
 
     [Test]
@@ -58,9 +58,9 @@ public sealed class RabbitMqMessageMapperTests
             timestamp: new AmqpTimestamp(sentAt.ToUnixTimeSeconds()),
             headers: new Dictionary<string, object?>
             {
-                ["messagebus.topic"] = "orders.created",
-                ["messagebus.broker"] = "broker-a",
-                ["messagebus.sent-at-utc"] = sentAt.ToString("O"),
+                ["ptrampert.messagebus.topic"] = "orders.created",
+                ["ptrampert.messagebus.broker"] = "broker-a",
+                ["ptrampert.messagebus.sent-at-utc"] = sentAt.ToString("O"),
                 ["trace-id"] = "abc-123"
             },
             body: body);
