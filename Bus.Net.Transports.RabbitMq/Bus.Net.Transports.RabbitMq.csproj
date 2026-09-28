@@ -7,10 +7,10 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <Authors>Paul Trampert</Authors>
-        <Description>RabbitMQ transport integration for Bussy.Net.</Description>
+        <Description>RabbitMQ transport integration for Bus.Net.</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageProjectUrl>https://github.com/PaulTrampert/Bussy.Net</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/PaulTrampert/Bussy.Net</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/PaulTrampert/Bus.Net</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/PaulTrampert/Bus.Net</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>

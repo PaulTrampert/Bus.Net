@@ -20,9 +20,9 @@ public static class ServiceCollectionExtensions
     /// </param>
     /// <param name="configureRabbitMq">An optional delegate to configure <see cref="RabbitMqTransportOptions"/>.</param>
     /// <returns>The same <see cref="IServiceCollection"/> instance so calls can be chained.</returns>
-    public static IServiceCollection AddBussyRabbitMqTransport(
+    public static IServiceCollection AddBusRabbitMqTransport(
         this IServiceCollection services,
-        Action<BussyConfigurator>? configure = null,
+        Action<BusConfigurator>? configure = null,
         Action<RabbitMqTransportOptions>? configureRabbitMq = null)
     {
         ArgumentNullException.ThrowIfNull(services);
@@ -30,7 +30,7 @@ public static class ServiceCollectionExtensions
         var options = new RabbitMqTransportOptions();
         configureRabbitMq?.Invoke(options);
 
-        services.AddBussy(configure);
+        services.AddBus(configure);
         services.AddSingleton(options);
         services.AddSingleton<IRabbitMqMessageMapper, RabbitMqMessageMapper>();
         services.AddSingleton<ITransport, RabbitMqTransport>();

@@ -12,9 +12,9 @@ namespace Bus.Net.Transports.RabbitMq;
 /// </summary>
 public sealed class RabbitMqMessageMapper : IRabbitMqMessageMapper
 {
-    private const string TopicHeader = "bussy.topic";
-    private const string BrokerHeader = "bussy.broker";
-    private const string SentAtUtcHeader = "bussy.sent-at-utc";
+    private const string TopicHeader = "busnet.topic";
+    private const string BrokerHeader = "busnet.broker";
+    private const string SentAtUtcHeader = "busnet.sent-at-utc";
     private const string DeliveryCountHeader = "x-delivery-count";
     private const string DeathHeader = "x-death";
 

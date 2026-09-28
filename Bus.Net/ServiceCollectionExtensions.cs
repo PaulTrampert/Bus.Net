@@ -16,7 +16,7 @@ public static class ServiceCollectionExtensions
     /// Registers all core Bus.Net services and applies the supplied configuration.
     /// Call this method (or a transport-specific overload that delegates to it) once during application startup.
     /// Any <see cref="IHandler{TMessage}"/> implementations already registered in the <see cref="IServiceCollection"/>
-    /// are automatically subscribed — no explicit <see cref="BussyConfigurator.RegisterHandler{THandler,TMessage}"/> call is needed.
+    /// are automatically subscribed — no explicit <see cref="BusConfigurator.RegisterHandler{THandler,TMessage}"/> call is needed.
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
     /// <param name="configure">
@@ -24,16 +24,16 @@ public static class ServiceCollectionExtensions
     /// When <see langword="null"/>, only handlers discovered from the service collection are registered.
     /// </param>
     /// <returns>The same <see cref="IServiceCollection"/> instance so calls can be chained.</returns>
-    public static IServiceCollection AddBussy(this IServiceCollection services, Action<BussyConfigurator>? configure = null)
+    public static IServiceCollection AddBus(this IServiceCollection services, Action<BusConfigurator>? configure = null)
     {
         services.TryAddSingleton<IMessageSerializer, JsonMessageSerializer>();
         services.AddSingleton<HandlerRegistry>();
         services.AddSingleton<TransportRegistry>();
         services.AddSingleton<MessageRouteResolver>();
-        services.AddSingleton<IHostedService, BussyService>();
-        services.AddSingleton<BussyConfigurator>(sp =>
+        services.AddSingleton<IHostedService, BusService>();
+        services.AddSingleton<BusConfigurator>(sp =>
         {
-            var configurator = new BussyConfigurator(
+            var configurator = new BusConfigurator(
                 sp.GetRequiredService<HandlerRegistry>(),
                 sp.GetRequiredService<TransportRegistry>(),
                 sp);
@@ -91,15 +91,15 @@ public static class ServiceCollectionExtensions
 
     /// <summary>
     /// Scans the given assemblies for <see cref="IHandler{TMessage}"/> implementations and registers each as a
-    /// scoped service using its concrete type. When used together with <see cref="AddBussy"/>, the discovered
+    /// scoped service using its concrete type. When used together with <see cref="AddBus"/>, the discovered
     /// handlers are automatically subscribed — no explicit
-    /// <see cref="BussyConfigurator.RegisterHandler{THandler,TMessage}"/> call is needed.
+    /// <see cref="BusConfigurator.RegisterHandler{THandler,TMessage}"/> call is needed.
     /// If no assemblies are provided, all assemblies currently loaded in the application domain are scanned.
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
     /// <param name="assemblies">The assemblies to scan. When empty, all loaded assemblies are used.</param>
     /// <returns>The same <see cref="IServiceCollection"/> instance so calls can be chained.</returns>
-    public static IServiceCollection AddBussyHandlers(this IServiceCollection services, params Assembly[] assemblies)
+    public static IServiceCollection AddBusHandlers(this IServiceCollection services, params Assembly[] assemblies)
     {
         assemblies = assemblies.Length > 0 ? assemblies : AppDomain.CurrentDomain.GetAssemblies();
         var handlerTypes = assemblies.SelectMany(

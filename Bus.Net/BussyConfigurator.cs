@@ -9,13 +9,13 @@ namespace Bus.Net;
 /// <summary>
 /// Provides configuration methods for registering message handlers and transports with the Bus.Net messaging infrastructure.
 /// </summary>
-public class BussyConfigurator
+public class BusConfigurator
 {
     internal readonly HandlerRegistry HandlerRegistry;
     internal readonly TransportRegistry TransportRegistry;
     private readonly IServiceProvider _serviceProvider;
 
-    internal BussyConfigurator(HandlerRegistry handlerRegistry, TransportRegistry transportRegistry, IServiceProvider serviceProvider)
+    internal BusConfigurator(HandlerRegistry handlerRegistry, TransportRegistry transportRegistry, IServiceProvider serviceProvider)
     {
         HandlerRegistry = handlerRegistry;
         TransportRegistry = transportRegistry;

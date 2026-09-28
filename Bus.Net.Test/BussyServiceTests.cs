@@ -8,22 +8,22 @@ using Moq;
 namespace Bus.Net.Test;
 
 [TestFixture]
-public sealed class BussyServiceTests
+public sealed class BusServiceTests
 {
     private HandlerRegistry _handlerRegistry = null!;
     private TransportRegistry _transportRegistry = null!;
-    private BussyConfigurator _bussyConfigurator = null!;
-    private ILogger<BussyService> _logger = null!;
-    private BussyService _subject = null!;
+    private BusConfigurator _busConfigurator = null!;
+    private ILogger<BusService> _logger = null!;
+    private BusService _subject = null!;
 
     [SetUp]
     public void SetUp()
     {
         _handlerRegistry = CreateHandlerRegistry();
         _transportRegistry = new TransportRegistry();
-        _bussyConfigurator = new BussyConfigurator(_handlerRegistry, _transportRegistry, Mock.Of<IServiceProvider>());
-        _logger = NullLogger<BussyService>.Instance;
-        _subject = new BussyService(_bussyConfigurator, _logger);
+        _busConfigurator = new BusConfigurator(_handlerRegistry, _transportRegistry, Mock.Of<IServiceProvider>());
+        _logger = NullLogger<BusService>.Instance;
+        _subject = new BusService(_busConfigurator, _logger);
     }
 
     [TearDown]

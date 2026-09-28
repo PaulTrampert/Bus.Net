@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.Json;
 
-namespace Bussy.Net;
+namespace Bus.Net;
 
 /// <summary>
 /// Default <see cref="IMessageSerializer"/> that serializes messages as UTF-8 JSON using

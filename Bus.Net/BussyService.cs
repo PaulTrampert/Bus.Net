@@ -5,11 +5,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Bus.Net;
 
-internal class BussyService(BussyConfigurator bussyConfigurator, ILogger<BussyService> logger) : BackgroundService
+internal class BusService(BusConfigurator busConfigurator, ILogger<BusService> logger) : BackgroundService
 {
     private readonly List<ITransportSubscription> _subscriptions = [];
-    private readonly HandlerRegistry _handlerRegistry = bussyConfigurator.HandlerRegistry;
-    private readonly TransportRegistry _transportRegistry = bussyConfigurator.TransportRegistry;
+    private readonly HandlerRegistry _handlerRegistry = busConfigurator.HandlerRegistry;
+    private readonly TransportRegistry _transportRegistry = busConfigurator.TransportRegistry;
 
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
@@ -29,11 +29,11 @@ internal class BussyService(BussyConfigurator bussyConfigurator, ILogger<BussySe
             {
                 if (e.CancellationToken == stoppingToken)
                 {
-                    logger.LogInformation("Shutting down BussyService");
+                    logger.LogInformation("Shutting down BusService");
                 }
                 else
                 {
-                    logger.LogError(e, "Unexpected cancellation requested, shutting down BussyService");
+                    logger.LogError(e, "Unexpected cancellation requested, shutting down BusService");
                 }
 
                 break;

@@ -35,8 +35,8 @@ public class RabbitMqEndToEndTests : EndToEndTestFixture
         {
             HostName = _rabbitMqContainer.Hostname,
             Port = _rabbitMqContainer.GetMappedPublicPort(5672),
-            UserName = "bussy",
-            Password = "bussy",
+            UserName = "busnet",
+            Password = "busnet",
             VirtualHost = "/",
         };
         _cachedConnection = await factory.CreateConnectionAsync(cancellationToken: cancellationToken);
@@ -48,8 +48,8 @@ public class RabbitMqEndToEndTests : EndToEndTestFixture
         {
             HostName = _rabbitMqContainer.Hostname,
             Port = _rabbitMqContainer.GetMappedPublicPort(5672),
-            UserName = "bussy",
-            Password = "bussy",
+            UserName = "busnet",
+            Password = "busnet",
             VirtualHost = "/",
         };
 
@@ -66,7 +66,7 @@ public class RabbitMqEndToEndTests : EndToEndTestFixture
                 await using var channel = await connection.CreateChannelAsync(cancellationToken: cancellationToken);
 
                 await channel.ExchangeDeclareAsync(
-                    exchange: "bussy.readiness.probe",
+                    exchange: "busnet.readiness.probe",
                     type: ExchangeType.Fanout,
                     durable: false,
                     autoDelete: true,
@@ -100,6 +100,6 @@ public class RabbitMqEndToEndTests : EndToEndTestFixture
     {
         // Provide the pre-initialized async connection.
         services.AddSingleton<IConnection>(_ => _cachedConnection ?? throw new InvalidOperationException("Connection not initialized"));
-        services.AddBussyRabbitMqTransport();
+        services.AddBusRabbitMqTransport();
     }
 }

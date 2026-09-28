@@ -12,7 +12,7 @@ public sealed class ServiceCollectionExtensionsTests
 {
     /// <summary>
     /// Builds a minimal service provider (without starting a hosted service) that contains
-    /// the core Bus.Net registrations so the <see cref="BussyConfigurator"/> singleton
+    /// the core Bus.Net registrations so the <see cref="BusConfigurator"/> singleton
     /// (and therefore the <see cref="HandlerRegistry"/>) can be resolved synchronously.
     /// </summary>
     private static ServiceProvider BuildProvider(Action<IServiceCollection> setup)
@@ -20,15 +20,15 @@ public sealed class ServiceCollectionExtensionsTests
         var services = new ServiceCollection();
         // Register a no-op ILoggerFactory so HandlerRegistry can be constructed.
         services.AddLogging();
-        // Register a stub transport so BussyConfigurator.RegisterTransports does not blow up.
+        // Register a stub transport so BusConfigurator.RegisterTransports does not blow up.
         var transport = new Mock<ITransport>();
         transport.Setup(t => t.Name).Returns("stub");
         services.AddSingleton(transport.Object);
         setup(services);
         var provider = services.BuildServiceProvider();
-        // Resolve BussyConfigurator to trigger its lazy singleton factory, which runs
+        // Resolve BusConfigurator to trigger its lazy singleton factory, which runs
         // the configure callback and auto-discovers IHandler<> implementations.
-        _ = provider.GetRequiredService<BussyConfigurator>();
+        _ = provider.GetRequiredService<BusConfigurator>();
         return provider;
     }
 
@@ -37,12 +37,12 @@ public sealed class ServiceCollectionExtensionsTests
     // ---------------------------------------------------------------------------
 
     [Test]
-    public void AddBussy_AutoDiscovers_HandlerRegisteredAsConcrete()
+    public void AddBus_AutoDiscovers_HandlerRegisteredAsConcrete()
     {
         using var provider = BuildProvider(sc =>
         {
             sc.AddScoped<SimpleTestHandler>();
-            sc.AddBussy();
+            sc.AddBus();
         });
 
         var registry = provider.GetRequiredService<HandlerRegistry>();
@@ -53,16 +53,16 @@ public sealed class ServiceCollectionExtensionsTests
     }
 
     [Test]
-    public void AddBussy_AutoDiscovers_HandlerRegisteredAsInterface()
+    public void AddBus_AutoDiscovers_HandlerRegisteredAsInterface()
     {
         using var provider = BuildProvider(sc =>
         {
             // Register as the IHandler<> interface for DI injection (e.g. via constructor).
             // Also register by concrete type so InboundMessageHandler can resolve it with
-            // GetRequiredService(handlerType) — Bussy always resolves handlers by their concrete type.
+            // GetRequiredService(handlerType) — Bus always resolves handlers by their concrete type.
             sc.AddScoped<IHandler<TestMessage>, SimpleTestHandler>();
             sc.AddScoped<SimpleTestHandler>();
-            sc.AddBussy();
+            sc.AddBus();
         });
 
         var registry = provider.GetRequiredService<HandlerRegistry>();
@@ -72,11 +72,11 @@ public sealed class ServiceCollectionExtensionsTests
     }
 
     [Test]
-    public void AddBussy_NoConfigure_NoHandlers_RegistryIsEmpty()
+    public void AddBus_NoConfigure_NoHandlers_RegistryIsEmpty()
     {
         using var provider = BuildProvider(sc =>
         {
-            sc.AddBussy();
+            sc.AddBus();
         });
 
         var registry = provider.GetRequiredService<HandlerRegistry>();
@@ -88,12 +88,12 @@ public sealed class ServiceCollectionExtensionsTests
     // ---------------------------------------------------------------------------
 
     [Test]
-    public void AddBussy_DoesNotDuplicate_WhenHandlerAlreadyExplicitlyRegistered()
+    public void AddBus_DoesNotDuplicate_WhenHandlerAlreadyExplicitlyRegistered()
     {
         using var provider = BuildProvider(sc =>
         {
             sc.AddScoped<SimpleTestHandler>();
-            sc.AddBussy(cfg =>
+            sc.AddBus(cfg =>
             {
                 // Explicit registration for the same handler with the same default route.
                 cfg.RegisterHandler<SimpleTestHandler, TestMessage>();
@@ -108,12 +108,12 @@ public sealed class ServiceCollectionExtensionsTests
     }
 
     [Test]
-    public void AddBussy_DoesNotDuplicate_WhenHandlerExplicitlyRegisteredWithCustomRoute()
+    public void AddBus_DoesNotDuplicate_WhenHandlerExplicitlyRegisteredWithCustomRoute()
     {
         using var provider = BuildProvider(sc =>
         {
             sc.AddScoped<SimpleTestHandler>();
-            sc.AddBussy(cfg =>
+            sc.AddBus(cfg =>
             {
                 // Explicit registration for the handler with a custom route.
                 cfg.RegisterHandler<SimpleTestHandler, TestMessage>(topic: "custom-topic");
@@ -139,12 +139,12 @@ public sealed class ServiceCollectionExtensionsTests
     // ---------------------------------------------------------------------------
 
     [Test]
-    public void AddBussy_AutoDiscovers_HandlerForAttributedMessage_UsesAttributeRoute()
+    public void AddBus_AutoDiscovers_HandlerForAttributedMessage_UsesAttributeRoute()
     {
         using var provider = BuildProvider(sc =>
         {
             sc.AddScoped<TopicOnlyMessageTestHandler>();
-            sc.AddBussy();
+            sc.AddBus();
         });
 
         var registry = provider.GetRequiredService<HandlerRegistry>();
@@ -158,12 +158,12 @@ public sealed class ServiceCollectionExtensionsTests
     // ---------------------------------------------------------------------------
 
     [Test]
-    public void AddBussy_ExplicitConfigure_WorksWithoutDiRegistration()
+    public void AddBus_ExplicitConfigure_WorksWithoutDiRegistration()
     {
         using var provider = BuildProvider(sc =>
         {
             // Handler is NOT registered in DI as a service — only declared via configure.
-            sc.AddBussy(cfg =>
+            sc.AddBus(cfg =>
             {
                 cfg.RegisterHandler<SimpleTestHandler, TestMessage>();
             });
@@ -180,28 +180,28 @@ public sealed class ServiceCollectionExtensionsTests
     // ---------------------------------------------------------------------------
 
     [Test]
-    public void AddBussy_RegistersBussyService_AsHostedService()
+    public void AddBus_RegistersBusService_AsHostedService()
     {
         using var provider = BuildProvider(sc =>
         {
-            sc.AddBussy();
+            sc.AddBus();
         });
 
         var hostedServices = provider.GetServices<IHostedService>();
-        Assert.That(hostedServices, Has.Exactly(1).InstanceOf<BussyService>());
+        Assert.That(hostedServices, Has.Exactly(1).InstanceOf<BusService>());
     }
 
     // ---------------------------------------------------------------------------
-    // AddBussyHandlers + AddBussy integration — call order
+    // AddBusHandlers + AddBus integration — call order
     // ---------------------------------------------------------------------------
 
     [Test]
-    public void AddBussyHandlers_BeforeAddBussy_AutoSubscribesScannedHandlers()
+    public void AddBusHandlers_BeforeAddBus_AutoSubscribesScannedHandlers()
     {
         using var provider = BuildProvider(sc =>
         {
-            sc.AddBussyHandlers(typeof(SimpleTestHandler).Assembly);
-            sc.AddBussy();
+            sc.AddBusHandlers(typeof(SimpleTestHandler).Assembly);
+            sc.AddBus();
         });
 
         var registry = provider.GetRequiredService<HandlerRegistry>();
@@ -211,13 +211,13 @@ public sealed class ServiceCollectionExtensionsTests
     }
 
     [Test]
-    public void AddBussy_BeforeAddBussyHandlers_AutoSubscribesScannedHandlers()
+    public void AddBus_BeforeAddBusHandlers_AutoSubscribesScannedHandlers()
     {
-        // Handlers scanned after AddBussy is called — order must not matter.
+        // Handlers scanned after AddBus is called — order must not matter.
         using var provider = BuildProvider(sc =>
         {
-            sc.AddBussy();
-            sc.AddBussyHandlers(typeof(SimpleTestHandler).Assembly);
+            sc.AddBus();
+            sc.AddBusHandlers(typeof(SimpleTestHandler).Assembly);
         });
 
         var registry = provider.GetRequiredService<HandlerRegistry>();
@@ -231,11 +231,11 @@ public sealed class ServiceCollectionExtensionsTests
     // ---------------------------------------------------------------------------
 
     [Test]
-    public void AddBussy_RegistersJsonMessageSerializer_AsDefaultIMessageSerializer()
+    public void AddBus_RegistersJsonMessageSerializer_AsDefaultIMessageSerializer()
     {
         using var provider = BuildProvider(sc =>
         {
-            sc.AddBussy();
+            sc.AddBus();
         });
 
         var serializer = provider.GetRequiredService<IMessageSerializer>();
@@ -243,13 +243,13 @@ public sealed class ServiceCollectionExtensionsTests
     }
 
     [Test]
-    public void AddBussy_DoesNotOverride_CustomIMessageSerializerRegisteredBeforehand()
+    public void AddBus_DoesNotOverride_CustomIMessageSerializerRegisteredBeforehand()
     {
         var customSerializer = new Mock<IMessageSerializer>().Object;
         using var provider = BuildProvider(sc =>
         {
             sc.AddSingleton(customSerializer);
-            sc.AddBussy();
+            sc.AddBus();
         });
 
         var serializer = provider.GetRequiredService<IMessageSerializer>();
