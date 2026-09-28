@@ -1,0 +1,73 @@
+using Bus.Net.Registries;
+using Bus.Net.Transport;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+
+namespace Bus.Net;
+
+internal class BussyService(BussyConfigurator bussyConfigurator, ILogger<BussyService> logger) : BackgroundService
+{
+    private readonly List<ITransportSubscription> _subscriptions = [];
+    private readonly HandlerRegistry _handlerRegistry = bussyConfigurator.HandlerRegistry;
+    private readonly TransportRegistry _transportRegistry = bussyConfigurator.TransportRegistry;
+
+    public override async Task StartAsync(CancellationToken cancellationToken)
+    {
+        await SubscribeHandlersAsync(cancellationToken);
+        await base.StartAsync(cancellationToken);
+    }
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            try
+            {
+                await Task.Delay(Timeout.InfiniteTimeSpan, stoppingToken);
+            }
+            catch (OperationCanceledException e)
+            {
+                if (e.CancellationToken == stoppingToken)
+                {
+                    logger.LogInformation("Shutting down BussyService");
+                }
+                else
+                {
+                    logger.LogError(e, "Unexpected cancellation requested, shutting down BussyService");
+                }
+
+                break;
+            }
+        }
+    }
+
+    private async Task SubscribeHandlersAsync(CancellationToken stoppingToken)
+    {
+        foreach (var (route, handlers) in _handlerRegistry.Handlers)
+        {
+            var handlerList = handlers.ToList();
+            IEnumerable<ITransport> transports = route.Broker is not null
+                ? _transportRegistry.Transports.TryGetValue(route.Broker, out var t) ? [t] : []
+                : _transportRegistry.Transports.Values;
+
+            foreach (var transport in transports)
+            foreach (var handler in handlerList)
+            {
+                var subscription = await transport.SubscribeAsync(
+                    route.Topic,
+                    handler,
+                    stoppingToken);
+
+                _subscriptions.Add(subscription);
+            }
+        }
+    }
+
+    public override async Task StopAsync(CancellationToken cancellationToken)
+    {
+        foreach (var subscription in _subscriptions)
+            await subscription.DisposeAsync();
+
+        await base.StopAsync(cancellationToken);
+    }
+}
