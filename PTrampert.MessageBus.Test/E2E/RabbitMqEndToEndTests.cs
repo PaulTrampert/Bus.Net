@@ -66,7 +66,7 @@ public class RabbitMqEndToEndTests : EndToEndTestFixture
                 await using var channel = await connection.CreateChannelAsync(cancellationToken: cancellationToken);
 
                 await channel.ExchangeDeclareAsync(
-                    exchange: "messagebus.readiness.probe",
+                    exchange: "ptrampert.messagebus.readiness.probe",
                     type: ExchangeType.Fanout,
                     durable: false,
                     autoDelete: true,
