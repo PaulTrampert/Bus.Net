@@ -139,7 +139,14 @@ public abstract class EndToEndTestFixture
         Assert.That(() => AttemptsFor(message.Id).Length, Is.EqualTo(MaxDeliveryAttempts).After(30000, 100));
         await Task.Delay(TimeSpan.FromSeconds(1));
 
-        Assert.That(AttemptsFor(message.Id), Is.EqualTo(Enumerable.Range(1, MaxDeliveryAttempts)));
+        var deadLetters = await GetDeadLetteredMessagesAsync();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(AttemptsFor(message.Id), Is.EqualTo(Enumerable.Range(1, MaxDeliveryAttempts)));
+            Assert.That(deadLetters.Any(m => m.Topic == FlakyMessage.Topic && m.Body.Contains(message.Id.ToString())), Is.False,
+                "A message that succeeds on its last allowed attempt should not be dead-lettered.");
+        });
     }
 
     [Test]
@@ -220,8 +227,11 @@ public abstract class EndToEndTestFixture
     }
 
     /// <summary>Fails until the last allowed delivery attempt, then succeeds.</summary>
-    [MessageRoute("e2e-flaky")]
-    protected sealed record FlakyMessage(Guid Id);
+    [MessageRoute(Topic)]
+    protected sealed record FlakyMessage(Guid Id)
+    {
+        public const string Topic = "e2e-flaky";
+    }
 
     protected sealed class FlakyMessageHandler : IHandler<FlakyMessage>
     {
