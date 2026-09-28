@@ -19,9 +19,9 @@ public static class ServiceCollectionExtensions
     /// When <see langword="null"/>, only handlers discovered from the service collection are registered.
     /// </param>
     /// <returns>The same <see cref="IServiceCollection"/> instance so calls can be chained.</returns>
-    public static IServiceCollection AddBusInMemoryTransport(this IServiceCollection services, Action<BusConfigurator>? configure = null)
+    public static IServiceCollection AddPTrampertMessageBusInMemoryTransport(this IServiceCollection services, Action<BusConfigurator>? configure = null)
     {
-        services.AddBus(configure);
+        services.AddPTrampertMessageBus(configure);
         
         services.AddSingleton<ITransport, InMemoryTransport>();
         return services;

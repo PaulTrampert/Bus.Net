@@ -45,7 +45,7 @@ The RabbitMQ end-to-end tests automatically spin up a RabbitMQ container using T
 
 1. Create a new class library project (e.g., `PTrampert.MessageBus.Transports.MyBroker`).
 2. Implement `ITransport` (defined in `PTrampert.MessageBus/Transport/`, and optionally `ITransportSender`/`ITransportReceiver`) in your new transport project.
-3. Add a `ServiceCollectionExtensions` class with an `AddBus<MyBroker>Transport` extension method that calls `services.AddBus(configure => ...)` and registers the transport.
+3. Add a `ServiceCollectionExtensions` class with an `AddPTrampertMessageBus<MyBroker>Transport` extension method that calls `services.AddPTrampertMessageBus(configure => ...)` and registers the transport.
 4. Add end-to-end tests that extend `EndToEndTestFixture` in `PTrampert.MessageBus.Test/E2E/`.
 5. Set `<SymbolPackageFormat>snupkg</SymbolPackageFormat>` in the new `.csproj` to match the other transport projects.
 

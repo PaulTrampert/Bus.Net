@@ -22,7 +22,7 @@ using Microsoft.Extensions.Hosting;
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.Services.AddScoped<GreetingHandler>();
-builder.Services.AddBusInMemoryTransport(configure =>
+builder.Services.AddPTrampertMessageBusInMemoryTransport(configure =>
 {
     configure.RegisterHandler<GreetingHandler, GreetingMessage>();
 });

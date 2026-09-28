@@ -7,6 +7,6 @@ public class InMemoryEndToEndTests : EndToEndTestFixture
 {
     protected override void ConfigureServices(IServiceCollection services)
     {
-        services.AddBusInMemoryTransport();
+        services.AddPTrampertMessageBusInMemoryTransport();
     }
 }

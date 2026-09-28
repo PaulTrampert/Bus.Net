@@ -100,6 +100,6 @@ public class RabbitMqEndToEndTests : EndToEndTestFixture
     {
         // Provide the pre-initialized async connection.
         services.AddSingleton<IConnection>(_ => _cachedConnection ?? throw new InvalidOperationException("Connection not initialized"));
-        services.AddBusRabbitMqTransport();
+        services.AddPTrampertMessageBusRabbitMqTransport();
     }
 }

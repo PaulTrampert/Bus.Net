@@ -37,12 +37,12 @@ public sealed class ServiceCollectionExtensionsTests
     // ---------------------------------------------------------------------------
 
     [Test]
-    public void AddBus_AutoDiscovers_HandlerRegisteredAsConcrete()
+    public void AddPTrampertMessageBus_AutoDiscovers_HandlerRegisteredAsConcrete()
     {
         using var provider = BuildProvider(sc =>
         {
             sc.AddScoped<SimpleTestHandler>();
-            sc.AddBus();
+            sc.AddPTrampertMessageBus();
         });
 
         var registry = provider.GetRequiredService<HandlerRegistry>();
@@ -53,7 +53,7 @@ public sealed class ServiceCollectionExtensionsTests
     }
 
     [Test]
-    public void AddBus_AutoDiscovers_HandlerRegisteredAsInterface()
+    public void AddPTrampertMessageBus_AutoDiscovers_HandlerRegisteredAsInterface()
     {
         using var provider = BuildProvider(sc =>
         {
@@ -62,7 +62,7 @@ public sealed class ServiceCollectionExtensionsTests
             // GetRequiredService(handlerType) — Bus always resolves handlers by their concrete type.
             sc.AddScoped<IHandler<TestMessage>, SimpleTestHandler>();
             sc.AddScoped<SimpleTestHandler>();
-            sc.AddBus();
+            sc.AddPTrampertMessageBus();
         });
 
         var registry = provider.GetRequiredService<HandlerRegistry>();
@@ -72,11 +72,11 @@ public sealed class ServiceCollectionExtensionsTests
     }
 
     [Test]
-    public void AddBus_NoConfigure_NoHandlers_RegistryIsEmpty()
+    public void AddPTrampertMessageBus_NoConfigure_NoHandlers_RegistryIsEmpty()
     {
         using var provider = BuildProvider(sc =>
         {
-            sc.AddBus();
+            sc.AddPTrampertMessageBus();
         });
 
         var registry = provider.GetRequiredService<HandlerRegistry>();
@@ -88,12 +88,12 @@ public sealed class ServiceCollectionExtensionsTests
     // ---------------------------------------------------------------------------
 
     [Test]
-    public void AddBus_DoesNotDuplicate_WhenHandlerAlreadyExplicitlyRegistered()
+    public void AddPTrampertMessageBus_DoesNotDuplicate_WhenHandlerAlreadyExplicitlyRegistered()
     {
         using var provider = BuildProvider(sc =>
         {
             sc.AddScoped<SimpleTestHandler>();
-            sc.AddBus(cfg =>
+            sc.AddPTrampertMessageBus(cfg =>
             {
                 // Explicit registration for the same handler with the same default route.
                 cfg.RegisterHandler<SimpleTestHandler, TestMessage>();
@@ -108,12 +108,12 @@ public sealed class ServiceCollectionExtensionsTests
     }
 
     [Test]
-    public void AddBus_DoesNotDuplicate_WhenHandlerExplicitlyRegisteredWithCustomRoute()
+    public void AddPTrampertMessageBus_DoesNotDuplicate_WhenHandlerExplicitlyRegisteredWithCustomRoute()
     {
         using var provider = BuildProvider(sc =>
         {
             sc.AddScoped<SimpleTestHandler>();
-            sc.AddBus(cfg =>
+            sc.AddPTrampertMessageBus(cfg =>
             {
                 // Explicit registration for the handler with a custom route.
                 cfg.RegisterHandler<SimpleTestHandler, TestMessage>(topic: "custom-topic");
@@ -139,12 +139,12 @@ public sealed class ServiceCollectionExtensionsTests
     // ---------------------------------------------------------------------------
 
     [Test]
-    public void AddBus_AutoDiscovers_HandlerForAttributedMessage_UsesAttributeRoute()
+    public void AddPTrampertMessageBus_AutoDiscovers_HandlerForAttributedMessage_UsesAttributeRoute()
     {
         using var provider = BuildProvider(sc =>
         {
             sc.AddScoped<TopicOnlyMessageTestHandler>();
-            sc.AddBus();
+            sc.AddPTrampertMessageBus();
         });
 
         var registry = provider.GetRequiredService<HandlerRegistry>();
@@ -158,12 +158,12 @@ public sealed class ServiceCollectionExtensionsTests
     // ---------------------------------------------------------------------------
 
     [Test]
-    public void AddBus_ExplicitConfigure_WorksWithoutDiRegistration()
+    public void AddPTrampertMessageBus_ExplicitConfigure_WorksWithoutDiRegistration()
     {
         using var provider = BuildProvider(sc =>
         {
             // Handler is NOT registered in DI as a service — only declared via configure.
-            sc.AddBus(cfg =>
+            sc.AddPTrampertMessageBus(cfg =>
             {
                 cfg.RegisterHandler<SimpleTestHandler, TestMessage>();
             });
@@ -180,11 +180,11 @@ public sealed class ServiceCollectionExtensionsTests
     // ---------------------------------------------------------------------------
 
     [Test]
-    public void AddBus_RegistersBusService_AsHostedService()
+    public void AddPTrampertMessageBus_RegistersBusService_AsHostedService()
     {
         using var provider = BuildProvider(sc =>
         {
-            sc.AddBus();
+            sc.AddPTrampertMessageBus();
         });
 
         var hostedServices = provider.GetServices<IHostedService>();
@@ -192,16 +192,16 @@ public sealed class ServiceCollectionExtensionsTests
     }
 
     // ---------------------------------------------------------------------------
-    // AddBusHandlers + AddBus integration — call order
+    // AddPTrampertMessageBusHandlers + AddPTrampertMessageBus integration — call order
     // ---------------------------------------------------------------------------
 
     [Test]
-    public void AddBusHandlers_BeforeAddBus_AutoSubscribesScannedHandlers()
+    public void AddPTrampertMessageBusHandlers_BeforeAddPTrampertMessageBus_AutoSubscribesScannedHandlers()
     {
         using var provider = BuildProvider(sc =>
         {
-            sc.AddBusHandlers(typeof(SimpleTestHandler).Assembly);
-            sc.AddBus();
+            sc.AddPTrampertMessageBusHandlers(typeof(SimpleTestHandler).Assembly);
+            sc.AddPTrampertMessageBus();
         });
 
         var registry = provider.GetRequiredService<HandlerRegistry>();
@@ -211,13 +211,13 @@ public sealed class ServiceCollectionExtensionsTests
     }
 
     [Test]
-    public void AddBus_BeforeAddBusHandlers_AutoSubscribesScannedHandlers()
+    public void AddPTrampertMessageBus_BeforeAddPTrampertMessageBusHandlers_AutoSubscribesScannedHandlers()
     {
-        // Handlers scanned after AddBus is called — order must not matter.
+        // Handlers scanned after AddPTrampertMessageBus is called — order must not matter.
         using var provider = BuildProvider(sc =>
         {
-            sc.AddBus();
-            sc.AddBusHandlers(typeof(SimpleTestHandler).Assembly);
+            sc.AddPTrampertMessageBus();
+            sc.AddPTrampertMessageBusHandlers(typeof(SimpleTestHandler).Assembly);
         });
 
         var registry = provider.GetRequiredService<HandlerRegistry>();
@@ -231,11 +231,11 @@ public sealed class ServiceCollectionExtensionsTests
     // ---------------------------------------------------------------------------
 
     [Test]
-    public void AddBus_RegistersJsonMessageSerializer_AsDefaultIMessageSerializer()
+    public void AddPTrampertMessageBus_RegistersJsonMessageSerializer_AsDefaultIMessageSerializer()
     {
         using var provider = BuildProvider(sc =>
         {
-            sc.AddBus();
+            sc.AddPTrampertMessageBus();
         });
 
         var serializer = provider.GetRequiredService<IMessageSerializer>();
@@ -243,13 +243,13 @@ public sealed class ServiceCollectionExtensionsTests
     }
 
     [Test]
-    public void AddBus_DoesNotOverride_CustomIMessageSerializerRegisteredBeforehand()
+    public void AddPTrampertMessageBus_DoesNotOverride_CustomIMessageSerializerRegisteredBeforehand()
     {
         var customSerializer = new Mock<IMessageSerializer>().Object;
         using var provider = BuildProvider(sc =>
         {
             sc.AddSingleton(customSerializer);
-            sc.AddBus();
+            sc.AddPTrampertMessageBus();
         });
 
         var serializer = provider.GetRequiredService<IMessageSerializer>();

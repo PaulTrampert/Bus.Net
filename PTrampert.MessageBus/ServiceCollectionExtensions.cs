@@ -24,7 +24,7 @@ public static class ServiceCollectionExtensions
     /// When <see langword="null"/>, only handlers discovered from the service collection are registered.
     /// </param>
     /// <returns>The same <see cref="IServiceCollection"/> instance so calls can be chained.</returns>
-    public static IServiceCollection AddBus(this IServiceCollection services, Action<BusConfigurator>? configure = null)
+    public static IServiceCollection AddPTrampertMessageBus(this IServiceCollection services, Action<BusConfigurator>? configure = null)
     {
         services.TryAddSingleton<IMessageSerializer, JsonMessageSerializer>();
         services.AddSingleton<HandlerRegistry>();
@@ -91,7 +91,7 @@ public static class ServiceCollectionExtensions
 
     /// <summary>
     /// Scans the given assemblies for <see cref="IHandler{TMessage}"/> implementations and registers each as a
-    /// scoped service using its concrete type. When used together with <see cref="AddBus"/>, the discovered
+    /// scoped service using its concrete type. When used together with <see cref="AddPTrampertMessageBus"/>, the discovered
     /// handlers are automatically subscribed — no explicit
     /// <see cref="BusConfigurator.RegisterHandler{THandler,TMessage}"/> call is needed.
     /// If no assemblies are provided, all assemblies currently loaded in the application domain are scanned.
@@ -99,7 +99,7 @@ public static class ServiceCollectionExtensions
     /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
     /// <param name="assemblies">The assemblies to scan. When empty, all loaded assemblies are used.</param>
     /// <returns>The same <see cref="IServiceCollection"/> instance so calls can be chained.</returns>
-    public static IServiceCollection AddBusHandlers(this IServiceCollection services, params Assembly[] assemblies)
+    public static IServiceCollection AddPTrampertMessageBusHandlers(this IServiceCollection services, params Assembly[] assemblies)
     {
         assemblies = assemblies.Length > 0 ? assemblies : AppDomain.CurrentDomain.GetAssemblies();
         var handlerTypes = assemblies.SelectMany(
