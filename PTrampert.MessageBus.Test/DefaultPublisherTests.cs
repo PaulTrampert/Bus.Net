@@ -175,9 +175,9 @@ public sealed class DefaultPublisherTests
 
     [TestCase("")]
     [TestCase("   ")]
-    public void PublishAsync_WithInvalidTopicOverride_ThrowsArgumentException(string invalidTopic)
+    public async Task PublishAsync_WithInvalidTopicOverride_ThrowsArgumentException(string invalidTopic)
     {
-        Assert.ThrowsAsync<ArgumentException>(() => _subject.PublishAsync(CreateMessage(), invalidTopic));
+        await Assert.ThrowsAsync<ArgumentException>(() => _subject.PublishAsync(CreateMessage(), invalidTopic));
     }
 
     // --- Broker override ---
@@ -192,16 +192,16 @@ public sealed class DefaultPublisherTests
     }
 
     [Test]
-    public void PublishAsync_WithUnknownBroker_ThrowsArgumentException()
+    public async Task PublishAsync_WithUnknownBroker_ThrowsArgumentException()
     {
-        Assert.ThrowsAsync<ArgumentException>(() => _subject.PublishAsync(CreateMessage(), "any-topic", "unknown"));
+        await Assert.ThrowsAsync<ArgumentException>(() => _subject.PublishAsync(CreateMessage(), "any-topic", "unknown"));
     }
 
     [TestCase("")]
     [TestCase("   ")]
-    public void PublishAsync_WithInvalidBrokerOverride_ThrowsArgumentException(string invalidBroker)
+    public async Task PublishAsync_WithInvalidBrokerOverride_ThrowsArgumentException(string invalidBroker)
     {
-        Assert.ThrowsAsync<ArgumentException>(() => _subject.PublishAsync(CreateMessage(), "any-topic", invalidBroker));
+        await Assert.ThrowsAsync<ArgumentException>(() => _subject.PublishAsync(CreateMessage(), "any-topic", invalidBroker));
     }
 
     // --- Batch variants with overrides ---
