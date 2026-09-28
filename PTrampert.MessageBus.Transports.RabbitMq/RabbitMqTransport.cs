@@ -85,8 +85,8 @@ public sealed class RabbitMqTransport(
     }
 
     /// <inheritdoc/>
-    public Task<ITransportSubscription> SubscribeAsync(string topic, IInboundMessageHandler handler,
-        CancellationToken cancellationToken = default)
+    public Task<ITransportSubscription> SubscribeAsync(IBusConfiguration configuration, string topic,
+        IInboundMessageHandler handler, CancellationToken cancellationToken = default)
     {
         return SubscribeInternalAsync(topic, handler, cancellationToken);
     }

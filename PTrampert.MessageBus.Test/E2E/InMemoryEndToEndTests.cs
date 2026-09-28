@@ -11,10 +11,10 @@ public class InMemoryEndToEndTests : EndToEndTestFixture
 {
     private readonly DeadLetterLogCollector _deadLetters = new();
 
-    protected override void ConfigureServices(IServiceCollection services)
+    protected override void ConfigureServices(IServiceCollection services, Action<BusConfigurator> configure)
     {
         services.AddSingleton<ILoggerProvider>(_deadLetters);
-        services.AddPTrampertMessageBusInMemoryTransport();
+        services.AddPTrampertMessageBusInMemoryTransport(configure);
     }
 
     protected override Task<IReadOnlyCollection<DeadLetteredMessage>> GetDeadLetteredMessagesAsync(CancellationToken cancellationToken = default)

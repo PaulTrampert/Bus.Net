@@ -33,7 +33,11 @@ public abstract class EndToEndTestFixture
         return Task.CompletedTask;
     }
 
-    protected abstract void ConfigureServices(IServiceCollection services);
+    /// <summary>
+    /// Registers the transport under test. Pass <paramref name="configure"/> on to the transport's
+    /// <c>AddPTrampertMessageBus…Transport</c> call so the fixture can configure the bus.
+    /// </summary>
+    protected abstract void ConfigureServices(IServiceCollection services, Action<BusConfigurator> configure);
 
     /// <summary>
     /// Returns the messages the transport is currently holding as dead letters, without removing them.
@@ -52,8 +56,7 @@ public abstract class EndToEndTestFixture
 
         hostBuilder.ConfigureServices(sc =>
         {
-            ConfigureServices(sc);
-            sc.Configure<MessageBusOptions>(options => options.MaxDeliveryAttempts = MaxDeliveryAttempts);
+            ConfigureServices(sc, bus => bus.MaxDeliveryAttempts = MaxDeliveryAttempts);
             sc.AddScoped<E2ETestMessageHandler>();
             sc.AddScoped<AlwaysFailingMessageHandler>();
             sc.AddScoped<FlakyMessageHandler>();

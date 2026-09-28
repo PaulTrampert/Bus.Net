@@ -151,10 +151,10 @@ public class RabbitMqEndToEndTests : EndToEndTestFixture
         await base.StopExternalDependenciesAsync(cancellationToken);
     }
 
-    protected override void ConfigureServices(IServiceCollection services)
+    protected override void ConfigureServices(IServiceCollection services, Action<BusConfigurator> configure)
     {
         // Provide the pre-initialized async connection.
         services.AddSingleton<IConnection>(_ => _cachedConnection ?? throw new InvalidOperationException("Connection not initialized"));
-        services.AddPTrampertMessageBusRabbitMqTransport();
+        services.AddPTrampertMessageBusRabbitMqTransport(configure);
     }
 }
